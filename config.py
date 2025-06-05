@@ -5,7 +5,7 @@ def get_config():
         "batch_size": 16,
         "num_epochs": 10,
         "lr": 10**-4,
-        "seq_len": 100,
+        "seq_len": 80,
         "d_model": 512,
         "datasource": 'harouzie',
         "lang_src": "English",
