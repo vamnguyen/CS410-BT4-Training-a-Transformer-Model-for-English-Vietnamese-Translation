@@ -90,7 +90,7 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
             source_texts.append(source_text)
             expected.append(target_text)
             predicted.append(model_out_text)
-            
+
             # Print the source, target and model output
             print_msg('-'*console_width)
             print_msg(f"{f'SOURCE: ':>12}{source_text}")
@@ -100,10 +100,10 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
             if count == num_examples:
                 print_msg('-'*console_width)
                 break
-    
+
     if writer:
         # Evaluate the character error rate
-        # Compute the char error rate 
+        # Compute the char error rate
         metric = torchmetrics.CharErrorRate()
         cer = metric(predicted, expected)
         writer.add_scalar('validation cer', cer, global_step)
@@ -123,7 +123,7 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
 
 def get_all_sentences(ds, lang):
     for item in ds:
-        yield item['translation'][lang]
+        yield item[lang]
 
 def get_or_build_tokenizer(config, ds, lang):
     tokenizer_path = Path(config['tokenizer_file'].format(lang))
@@ -140,7 +140,7 @@ def get_or_build_tokenizer(config, ds, lang):
 
 def get_ds(config):
     # It only has the train split, so we divide it overselves
-    ds_raw = load_dataset(f"{config['datasource']}", f"{config['lang_src']}-{config['lang_tgt']}", split='train')
+    ds_raw = load_dataset("harouzie/vi_en-translation", split='train')
 
     # Build tokenizers
     tokenizer_src = get_or_build_tokenizer(config, ds_raw, config['lang_src'])
@@ -159,14 +159,14 @@ def get_ds(config):
     max_len_tgt = 0
 
     for item in ds_raw:
-        src_ids = tokenizer_src.encode(item['translation'][config['lang_src']]).ids
-        tgt_ids = tokenizer_tgt.encode(item['translation'][config['lang_tgt']]).ids
+        src_ids = tokenizer_src.encode(item[config['lang_src']]).ids
+        tgt_ids = tokenizer_tgt.encode(item[config['lang_tgt']]).ids
         max_len_src = max(max_len_src, len(src_ids))
         max_len_tgt = max(max_len_tgt, len(tgt_ids))
 
     print(f'Max length of source sentence: {max_len_src}')
     print(f'Max length of target sentence: {max_len_tgt}')
-    
+
 
     train_dataloader = DataLoader(train_ds, batch_size=config['batch_size'], shuffle=True)
     val_dataloader = DataLoader(val_ds, batch_size=1, shuffle=True)

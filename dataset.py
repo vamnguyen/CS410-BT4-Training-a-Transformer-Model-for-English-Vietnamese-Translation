@@ -23,8 +23,8 @@ class BilingualDataset(Dataset):
 
     def __getitem__(self, idx):
         src_target_pair = self.ds[idx]
-        src_text = src_target_pair['translation'][self.src_lang]
-        tgt_text = src_target_pair['translation'][self.tgt_lang]
+        src_text = src_target_pair[self.src_lang]
+        tgt_text = src_target_pair[self.tgt_lang]
 
         # Transform the text into tokens
         enc_input_tokens = self.tokenizer_src.encode(src_text).ids
@@ -84,7 +84,7 @@ class BilingualDataset(Dataset):
             "src_text": src_text,
             "tgt_text": tgt_text,
         }
-    
+
 def causal_mask(size):
     mask = torch.triu(torch.ones((1, size, size)), diagonal=1).type(torch.int)
     return mask == 0
